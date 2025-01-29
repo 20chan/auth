@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
   providers,
   adapter,
   session: {
-    strategy: 'jwt',
+    strategy: 'database',
   },
   cookies: {
     sessionToken: {
@@ -34,18 +34,45 @@ export const authOptions: NextAuthOptions = {
       },
     },
   },
+  callbacks: {
+    session: async ({ session, user }) => {
+      if (session?.user) {
+        session.user.id = user.id;
+      }
+
+      return session;
+    },
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.sub = user.id;
+      }
+
+      return token;
+    },
+  },
   pages: {
     signIn: '/',
   },
 };
 
-export function auth(
+export async function auth(
   ...args:
     | [GetServerSidePropsContext["req"], GetServerSidePropsContext["res"]]
     | [NextApiRequest, NextApiResponse]
     | []
 ) {
-  return getServerSession(...args, authOptions);
+  const session = await getServerSession(...args, authOptions);
+  if (!session?.user) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+  });
+
+  return { user };
 }
 
 export const handler = NextAuth(authOptions);

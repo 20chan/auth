@@ -1,12 +1,12 @@
 import { SignInButtons } from '@/components/SignInButtons';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
 export default async function Home(props: {
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   const { callbackUrl } = await props.searchParams;
-  const session = await getServerSession();
+  const session = await auth();
 
   if (session?.user) {
     redirect(callbackUrl ?? '/my');
