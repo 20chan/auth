@@ -2,11 +2,14 @@ import { SignInButtons } from '@/components/SignInButtons';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 
-export default async function Home() {
+export default async function Home(props: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
+  const { callbackUrl } = await props.searchParams;
   const session = await getServerSession();
 
   if (session?.user) {
-    redirect('/my');
+    redirect(callbackUrl ?? '/my');
   }
 
   return (
@@ -15,7 +18,7 @@ export default async function Home() {
         auth
       </div>
 
-      <SignInButtons />
+      <SignInButtons callbackUrl={callbackUrl} />
     </div>
   );
 }

@@ -1,13 +1,14 @@
-import { handler, providers } from '@/lib/auth';
+import { providers } from '@/lib/auth';
 import { SignInButton } from './SignInButton';
 
-export function SignInButtons() {
-  console.log(handler);
+export function SignInButtons(props: {
+  callbackUrl?: string;
+}) {
 
   return (
     <div className='flex space-x-4'>
       {providers.map((provider) => (
-        <SignInButton key={provider.id} provider={provider.id} />
+        <SignInButton key={provider.id} provider={provider.id} callbackUrl={props.callbackUrl} />
       ))}
     </div>
   )
