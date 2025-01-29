@@ -49,9 +49,22 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
+    signIn: async ({ user }) => {
+      const userDb = await prisma.user.findUnique({
+        where: {
+          id: user.id,
+        },
+      });
+
+      if (!userDb?.approvedAt) {
+        return false;
+      }
+      return true;
+    }
   },
   pages: {
     signIn: '/',
+    error: '/error',
   },
 };
 
